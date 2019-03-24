@@ -4,7 +4,9 @@ library(xml2)
 library(tidyverse)
 
 
-# docker
+## docker
+
+
 remDr <- remoteDriver(
   remoteServerAddr = "localhost",
   port = 4445L,
@@ -25,17 +27,26 @@ temp <- read_html(remDr$getPageSource()[[1]])
 
 # il faut trouver le bon nodes, je tatonne encore un peu
 
+# titre
 titre <- temp %>%
   rvest::html_nodes("h1._1KQme") %>%
   rvest::html_text()
 
-
+# prix
 prix <- temp %>%
   rvest::html_nodes("span._1F5u3") %>%
   rvest::html_text()
 
 prix[1]
 
+# date 
+
+date<- temp %>%
+  rvest::html_nodes("div._14taM") %>%
+  rvest::html_children() %>%
+  rvest::html_text()[3]
+
+# text
 texte <- temp %>%
   rvest::html_nodes("span.content-CxPmi") %>%
   rvest::html_text()
@@ -50,7 +61,6 @@ vendeur <- temp %>%
   rvest::html_nodes("div._2zgX4") %>%
   rvest::html_children() %>%
   rvest::html_text()
-
 
 
 class(remDr$getPageSource()[[1]])
