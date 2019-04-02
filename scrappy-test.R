@@ -21,13 +21,13 @@ remDr$open()
 
 # va sur une page
 
-remDr$navigate("https://www.leboncoin.fr/annonces/offres/") 
+remDr$navigate("https://www.leboncoin.fr/jardinage/offres/") 
 
 recherchelbc.webElem <- remDr$findElement(using = "css", "input[value='']")
 recherchelbc.webElem$sendKeysToElement(list("bois de chauffage", key = "enter"))
 
 remDr$getCurrentUrl() # pour une verif
-remDr$screenshot(display = TRUE) # une autre pour le moment on doit cibler la categorie jardinage
+remDr$screenshot(display = TRUE)
 
 
 # va sur une page specifique
