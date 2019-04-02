@@ -7,17 +7,30 @@ library(tidyverse)
 # docker run -d -p 4445:4444 selenium/standalone-firefox:2.53.0
 # docker ps
 
-
+# connection
 remDr <- remoteDriver(
   remoteServerAddr = "localhost",
   port = 4445L,
   browserName = "firefox"
 )
 
-
+# ouverture
 remDr$open()
+ 
+# faire une recherche
 
 # va sur une page
+
+remDr$navigate("https://www.leboncoin.fr/annonces/offres/") 
+
+recherchelbc.webElem <- remDr$findElement(using = "css", "input[value='']")
+recherchelbc.webElem$sendKeysToElement(list("bois de chauffage", key = "enter"))
+
+remDr$getCurrentUrl() # pour une verif
+remDr$screenshot(display = TRUE) # une autre pour le moment on doit cibler la categorie jardinage
+
+
+# va sur une page specifique
 
 remDr$navigate("https://www.leboncoin.fr/jardinage/1572758346.htm/") 
 
