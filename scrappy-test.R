@@ -3,8 +3,9 @@ library(rvest)
 library(xml2)
 library(tidyverse)
 
-
-## docker
+## docker à mettre dans un shell
+# docker run -d -p 4445:4444 selenium/standalone-firefox:2.53.0
+# docker ps
 
 
 remDr <- remoteDriver(
