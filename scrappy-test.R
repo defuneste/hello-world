@@ -39,6 +39,27 @@ remDr$screenshot(display = TRUE)
 # on va recup le code html
 temp <- read_html(remDr$getPageSource()[[1]])
 
+# un test sur une page d'annonce
+
+titre <- temp %>%
+  rvest::html_nodes("p._2tubl") %>%
+  rvest::html_text()
+
+prix <- temp %>%
+  rvest::html_nodes("div._2OJ8g") %>%
+  rvest::html_text()
+
+localisation <- temp %>%
+  rvest::html_nodes("p._2qeuk") %>%
+  rvest::html_text()
+
+lien <- temp %>%
+  rvest::html_nodes("a.clearfix.trackable") %>%
+  rvest::html_text()
+
+# recup toutes les html d'une page
+html_attr(html_nodes(temp, "a"), "href")
+
 # il faut trouver le bon nodes, je tatonne encore un peu
 
 # titre
