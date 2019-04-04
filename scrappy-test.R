@@ -61,14 +61,13 @@ html_attr(html_nodes(temp, "a"), "href")
 
 # il faut trouver le bon nodes, je tatonne encore un peu
 
-
 # va sur une page specifique
 
-remDr$navigate("https://www.leboncoin.fr/jardinage/1572758346.htm/") 
+remDr$navigate(boisbrute$lien[1]) 
+
+class(boisbrute$lien[1])
 
 remDr$screenshot(display = TRUE)
-
-
 
 # titre
 titre <- temp %>%
