@@ -55,7 +55,9 @@ localisation <- temp %>%
 
 lien <- temp %>%
   rvest::html_nodes("a.clearfix.trackable") %>%
-  rvest::html_text()
+  rvest::html_attr( "href") %>%
+
+
 
 # recup toutes les html d'une page
 html_attr(html_nodes(temp, "a"), "href")
