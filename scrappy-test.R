@@ -17,9 +17,9 @@ remDr <- remoteDriver(
 # ouverture
 remDr$open()
  
-# faire une recherche
+#### faire une recherche
 
-# va sur une page
+### va sur une page
 
 remDr$navigate("https://www.leboncoin.fr/jardinage/offres/") 
 
@@ -30,12 +30,6 @@ remDr$getCurrentUrl() # pour une verif
 remDr$screenshot(display = TRUE)
 
 
-# va sur une page specifique
-
-remDr$navigate("https://www.leboncoin.fr/jardinage/1572758346.htm/") 
-
-remDr$screenshot(display = TRUE)
-
 # on va recup le code html
 temp <- read_html(remDr$getPageSource()[[1]])
 
@@ -45,7 +39,7 @@ titre <- temp %>%
   rvest::html_nodes("p._2tubl") %>%
   rvest::html_text()
 
-prix <- temp %>%
+prix <- temp %>% # le prix n'est pas obligatoire donc pas toujours indiqué 
   rvest::html_nodes("div._2OJ8g") %>%
   rvest::html_text()
 
@@ -57,12 +51,24 @@ lien <- temp %>%
   rvest::html_nodes("a.clearfix.trackable") %>%
   rvest::html_attr( "href") %>%
 
+boisbrute <- data_frame(titre, localisation)  
+boisbrute <- boisbrute %>%
+  mutate(lien = paste0("https://www.leboncoin.fr",lien))
 
 
 # recup toutes les html d'une page
 html_attr(html_nodes(temp, "a"), "href")
 
 # il faut trouver le bon nodes, je tatonne encore un peu
+
+
+# va sur une page specifique
+
+remDr$navigate("https://www.leboncoin.fr/jardinage/1572758346.htm/") 
+
+remDr$screenshot(display = TRUE)
+
+
 
 # titre
 titre <- temp %>%
