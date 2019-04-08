@@ -7,7 +7,7 @@ library(tidyverse)
 # docker run -d -p 4445:4444 selenium/standalone-firefox:2.53.0
 # docker ps
 
-# connection
+# connection =====
 remDr <- remoteDriver(
   remoteServerAddr = "localhost",
   port = 4445L,
@@ -17,7 +17,7 @@ remDr <- remoteDriver(
 # ouverture
 remDr$open()
  
-#### faire une recherche
+#### faire une recherche =====
 
 ### va sur une page
 
@@ -49,7 +49,7 @@ localisation <- temp %>%
 
 lien <- temp %>%
   rvest::html_nodes("a.clearfix.trackable") %>%
-  rvest::html_attr( "href") %>%
+  rvest::html_attr( "href") 
 
 boisbrute <- data_frame(titre, localisation)  
 boisbrute <- boisbrute %>%
@@ -61,7 +61,7 @@ listehtml <- list()
 
 navigation <- function(lienhref) { # prend un href 
   remDr$navigate(lienhref)     # va dessus
-  listehtml <- read_html(remDr$getPageSource()[[1]]) # sauve dans une liste
+  listehtml <- read_html(remDr$getPageSource()[[1]]) # sauve dans une liste / pe a corriger si pas besoin d'une liste ici 
 }
 
 page_annonce <- lapply(boisbrute$lien, navigation)
@@ -74,9 +74,11 @@ titre_annonce <- function(une_page) {
     rvest::html_text()
 }
 
-lapply(page_annonce, titre_annonce)
+unlist(lapply(page_annonce, titre_annonce))
 
 boisbrute$titre
+
+# fonction localisation pour verifier
 
 localisation_annonce <- function(une_page) { 
   une_page %>%
@@ -86,6 +88,37 @@ localisation_annonce <- function(une_page) {
 }
 
 lapply(page_annonce, localisation_annonce)
+
+# le prix ====
+
+prix_annonce <- function(une_page) { 
+  une_page %>%
+    rvest::html_nodes("span._1F5u3") %>%
+    rvest::html_text() # on prend tous les prix avec le CSS
+} 
+
+verif_prix <- function(resultat_prix_anonce) { # on filtre ceux vide et sinon on prend le premier 
+ifelse(length(resultat_prix_anonce) == 0, NA, resultat_prix_anonce[1])}
+
+
+boisbrute$prix <- unlist(lapply(lapply(page_annonce, prix_annonce), verif_prix)) # verifier si unlist est pas un arg de lapply
+
+# le texte ====
+
+texte_annonce <- function(une_page) {
+  une_page %>%
+  rvest::html_nodes("span.content-CxPmi") %>%
+  rvest::html_text()
+  }
+
+verif_texte <- function(resultat_texte_anonce) { # on filtre ceux vide et sinon on garde tout 
+  ifelse(length(resultat_texte_anonce) == 0, NA, resultat_texte_anonce)}
+
+unlist(lapply(lapply(page_annonce, texte_annonce), verif_texte))
+
+texte_annonce(page_annonce[[15]])
+localisation_annonce(page_annonce[[15]])
+
 
 # recup toutes les html d'une page
 html_attr(html_nodes(temp, "a"), "href")
@@ -137,3 +170,6 @@ vendeur <- temp %>%
 
 
 class(remDr$getPageSource()[[1]])
+
+
+remDr$close()
