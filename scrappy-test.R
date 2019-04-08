@@ -64,8 +64,28 @@ navigation <- function(lienhref) { # prend un href
   listehtml <- read_html(remDr$getPageSource()[[1]]) # sauve dans une liste
 }
 
-test <- lapply(boisbrute$lien, navigation)
+page_annonce <- lapply(boisbrute$lien, navigation)
 
+# fonction titre pour verifier
+
+titre_annonce <- function(une_page) {
+  une_page %>%
+    rvest::html_nodes("h1._1KQme") %>%
+    rvest::html_text()
+}
+
+lapply(page_annonce, titre_annonce)
+
+boisbrute$titre
+
+localisation_annonce <- function(une_page) { 
+  une_page %>%
+  rvest::html_nodes("div._1aCZv") %>%
+  rvest::html_text() %>%
+  str_remove("Voir sur la carte")
+}
+
+lapply(page_annonce, localisation_annonce)
 
 # recup toutes les html d'une page
 html_attr(html_nodes(temp, "a"), "href")
