@@ -55,6 +55,17 @@ boisbrute <- data_frame(titre, localisation)
 boisbrute <- boisbrute %>%
   mutate(lien = paste0("https://www.leboncoin.fr",lien))
 
+# on va faire un fonction qui prend toute les pages
+
+listehtml <- list()
+
+navigation <- function(lienhref) { # prend un href 
+  remDr$navigate(lienhref)     # va dessus
+  listehtml <- read_html(remDr$getPageSource()[[1]]) # sauve dans une liste
+}
+
+test <- lapply(boisbrute$lien, navigation)
+
 
 # recup toutes les html d'une page
 html_attr(html_nodes(temp, "a"), "href")
