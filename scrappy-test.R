@@ -1,4 +1,5 @@
 library(RSelenium)
+#library(seleniumPipes)
 library(rvest)
 library(xml2)
 library(tidyverse)
@@ -22,6 +23,7 @@ remDr$open()
 ### va sur une page
 
 remDr$navigate("https://www.leboncoin.fr/jardinage/offres/") 
+
 
 recherchelbc.webElem <- remDr$findElement(using = "css", "input[value='']")
 recherchelbc.webElem$sendKeysToElement(list("bois de chauffage", key = "enter"))
@@ -57,11 +59,10 @@ boisbrute <- boisbrute %>%
 
 # on va faire un fonction qui prend toute les pages
 
-listehtml <- list()
-
 navigation <- function(lienhref) { # prend un href 
   remDr$navigate(lienhref)     # va dessus
-  listehtml <- read_html(remDr$getPageSource()[[1]]) # sauve dans une liste / pe a corriger si pas besoin d'une liste ici 
+  remDr$setTimeout(type = "page load", milliseconds = 20000)
+  read_html(remDr$getPageSource()[[1]]) # sauve dans une liste / pe a corriger si pas besoin d'une liste ici 
 }
 
 page_annonce <- lapply(boisbrute$lien, navigation)
@@ -87,19 +88,18 @@ localisation_annonce <- function(une_page) {
   str_remove("Voir sur la carte")
 }
 
-lapply(page_annonce, localisation_annonce)
+unlist(lapply(page_annonce, localisation_annonce))
 
 # le prix ====
 
 prix_annonce <- function(une_page) { 
   une_page %>%
-    rvest::html_nodes("span._1F5u3") %>%
+    rvest::html_nodes("span._1F5u3") %>% 
     rvest::html_text() # on prend tous les prix avec le CSS
 } 
 
 verif_prix <- function(resultat_prix_anonce) { # on filtre ceux vide et sinon on prend le premier 
 ifelse(length(resultat_prix_anonce) == 0, NA, resultat_prix_anonce[1])}
-
 
 boisbrute$prix <- unlist(lapply(lapply(page_annonce, prix_annonce), verif_prix)) # verifier si unlist est pas un arg de lapply
 
@@ -114,11 +114,14 @@ texte_annonce <- function(une_page) {
 verif_texte <- function(resultat_texte_anonce) { # on filtre ceux vide et sinon on garde tout 
   ifelse(length(resultat_texte_anonce) == 0, NA, resultat_texte_anonce)}
 
-unlist(lapply(lapply(page_annonce, texte_annonce), verif_texte))
+boisbrute$texte <- unlist(lapply(lapply(page_annonce, texte_annonce), verif_texte))
 
-texte_annonce(page_annonce[[15]])
-localisation_annonce(page_annonce[[15]])
+# on bouche les trous par un repassage ====
 
+manque <- lapply(boisbrute$lien[is.na(boisbrute$prix)], navigation)
+
+boisbrute$texte[is.na(boisbrute$prix)] <-unlist(lapply(lapply(manque, texte_annonce), verif_texte)) # attention toujours sur prix
+boisbrute$prix[is.na(boisbrute$prix)] <- unlist(lapply(lapply(manque, prix_annonce), verif_prix)) # attention à l'ordre
 
 # recup toutes les html d'une page
 html_attr(html_nodes(temp, "a"), "href")
